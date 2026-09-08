@@ -1,93 +1,70 @@
-import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  FlatList,
-  StyleSheet,
-} from "react-native";
+import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { playSound } from "../services/soundHandler";
 
 const AllWords = ({ switchScreen, words, setWords }) => {
-  const deleteWord = (wordToDelete) => {
-    if (!setWords) return;
-
-    setWords((currentWords) =>
-      currentWords.filter((item) => item.word !== wordToDelete)
-    );
-  };
-
   const handlePlay = (audio) => {
     if (audio) {
       playSound(audio);
     }
   };
 
-  const renderWord = ({ item }) => (
-    <View style={styles.wordContainer}>
-      <View style={styles.wordInfo}>
-        <Text style={styles.word}>{item.word}</Text>
+  const handleDelete = (index) => {
+    setWords((prevWords) =>
+      prevWords.filter((_, wordIndex) => wordIndex !== index)
+    );
+  };
 
-        <Text style={styles.phonetic}>
-          {item.phonetics || item.phonetic || ""}
-        </Text>
-
-        {item.partOfSpeech && (
-          <Text style={styles.partOfSpeech}>
-            {item.partOfSpeech}
-          </Text>
-        )}
-
-        <Text style={styles.meaning}>
-          {item.meaning}
-        </Text>
-      </View>
-
-      <View style={styles.buttons}>
-        {/* PLAY — завжди показуємо кнопку */}
+  const renderWord = ({ item, index }) => {
+    return (
+      <View style={styles.wordItem}>
+        {/* PLAY — завжди показуємо */}
         <Pressable onPress={() => handlePlay(item.audio)}>
-          <Ionicons
-            name="play-outline"
-            size={28}
-          />
+          <Ionicons name="play-outline" size={28} />
         </Pressable>
+
+        <View style={styles.wordInfo}>
+          <Text style={styles.word}>{item.word}</Text>
+
+          <Text style={styles.meaning}>
+            {item.meaning}
+          </Text>
+
+          <Text style={styles.phonetic}>
+            {item.phonetics || item.phonetic}
+          </Text>
+        </View>
 
         {/* DELETE */}
-        <Pressable onPress={() => deleteWord(item.word)}>
-          <Ionicons
-            name="trash-outline"
-            size={28}
-          />
+        <Pressable onPress={() => handleDelete(index)}>
+          <Ionicons name="trash-outline" size={26} />
         </Pressable>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>My Words</Text>
+        <Text style={styles.title}>My dictionary</Text>
 
-        <Pressable onPress={() => switchScreen("addWord")}>
-          <Ionicons
-            name="add-outline"
-            size={32}
-          />
+        <Pressable
+          style={styles.addButton}
+          onPress={() => switchScreen("addWord")}
+        >
+          <Ionicons name="add-outline" size={32} color="white" />
         </Pressable>
       </View>
 
       <FlatList
         data={words}
         renderItem={renderWord}
-        keyExtractor={(item, index) =>
-          `${item.word}-${index}`
-        }
+        keyExtractor={(_, index) => index.toString()}
         ListEmptyComponent={
-          <Text style={styles.empty}>
-            No words yet
-          </Text>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No words yet</Text>
+          </View>
         }
       />
     </View>
@@ -97,14 +74,14 @@ const AllWords = ({ switchScreen, words, setWords }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: "#ffffff",
   },
 
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    height: 110,
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    position: "relative",
   },
 
   title: {
@@ -112,49 +89,69 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  wordContainer: {
-    padding: 15,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderRadius: 8,
+  addButton: {
+    position: "absolute",
+    right: 20,
+    bottom: 10,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#2196F3",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  wordItem: {
+    minHeight: 65,
+    marginHorizontal: 15,
+    marginVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+
+    elevation: 2,
   },
 
   wordInfo: {
     flex: 1,
+    marginHorizontal: 12,
   },
 
   word: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
   },
 
-  phonetic: {
-    marginTop: 4,
-    fontSize: 16,
-  },
-
-  partOfSpeech: {
-    marginTop: 4,
-    fontStyle: "italic",
-  },
-
   meaning: {
-    marginTop: 8,
-    fontSize: 16,
+    fontSize: 14,
+    marginTop: 2,
   },
 
-  buttons: {
-    flexDirection: "row",
+  phonetic: {
+    fontSize: 12,
+    color: "#777",
+  },
+
+  emptyContainer: {
     alignItems: "center",
-    gap: 10,
+    justifyContent: "center",
+    paddingTop: 100,
   },
 
-  empty: {
-    textAlign: "center",
-    marginTop: 40,
-    fontSize: 18,
+  emptyText: {
+    fontSize: 24,
+    color: "#777",
   },
 });
 
