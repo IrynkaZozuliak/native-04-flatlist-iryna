@@ -116,3 +116,33 @@ test("if the audio is absent, the icon is not shown", async () => {
   expect(playButton).not.toBeOnTheScreen();
   expect(investigateText).toBeOnTheScreen();
 });
+
+test("adds the found word and switches to all words", async () => {
+  const user = userEvent.setup();
+  jest.useFakeTimers();
+  const returnedWordData = {
+    word: "investigate",
+    meaning: "To inquire into or study.",
+  };
+  const setWords = jest.fn();
+  const switchScreen = jest.fn();
+  jest.spyOn(wordsService, "getWordInfo").mockReturnValueOnce(returnedWordData);
+
+  render(
+    <AddWord
+      setWords={setWords}
+      switchScreen={switchScreen}
+    />
+  );
+
+  const input = screen.getByPlaceholderText("type here..");
+  await act(async () => {
+    await user.type(input, "hello");
+    jest.advanceTimersByTime(1050);
+  });
+
+  await user.press(screen.getByText("Add"));
+
+  expect(setWords).toHaveBeenCalledTimes(1);
+  expect(switchScreen).toHaveBeenCalledWith("allWords");
+});

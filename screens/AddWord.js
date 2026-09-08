@@ -15,16 +15,23 @@ import { playSound } from "../services/soundHandler";
 const AddWord = ({ switchScreen, setWords }) => {
   const [inputValue, setInputValue] = useState("");
   const [wordInfo, setWordInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearchError, setHasSearchError] = useState(false);
 
   const requestId = useRef(0);
 
   useEffect(() => {
     if (!inputValue.trim()) {
       setWordInfo(null);
+      setIsLoading(false);
+      setHasSearchError(false);
       return;
     }
 
     const currentRequestId = ++requestId.current;
+    setWordInfo(null);
+    setIsLoading(true);
+    setHasSearchError(false);
 
     const timer = setTimeout(async () => {
       const result = await getWordInfo(inputValue.trim());
@@ -34,6 +41,8 @@ const AddWord = ({ switchScreen, setWords }) => {
       }
 
       setWordInfo(result);
+      setIsLoading(false);
+      setHasSearchError(!result);
     }, 1000);
 
     return () => {
@@ -87,6 +96,16 @@ const AddWord = ({ switchScreen, setWords }) => {
         autoCapitalize="none"
         autoCorrect={false}
       />
+
+      {isLoading ? (
+        <Text style={styles.status}>Searching...</Text>
+      ) : null}
+
+      {hasSearchError ? (
+        <Text style={styles.status}>
+          Word not found or the dictionary service is unavailable.
+        </Text>
+      ) : null}
 
       {wordInfo ? (
         <View style={styles.result}>
@@ -178,6 +197,12 @@ const styles = StyleSheet.create({
 
   result: {
     marginTop: 30,
+  },
+
+  status: {
+    marginTop: 20,
+    fontSize: 16,
+    color: "#666",
   },
 
   wordHeader: {
