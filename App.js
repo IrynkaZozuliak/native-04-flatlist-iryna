@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  StatusBar,
-} from "react-native";
+import { View, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import AllWords from "./screens/AllWords";
@@ -19,11 +15,6 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#ffffff"
-      />
-
       {activeScreen === "allWords" ? (
         <AllWords
           switchScreen={switchScreen}
@@ -43,7 +34,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fff",
   },
 });
 
